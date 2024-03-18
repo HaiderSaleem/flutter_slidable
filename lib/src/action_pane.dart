@@ -54,10 +54,8 @@ class ActionPane extends StatefulWidget {
     this.closeThreshold,
     required this.children,
   })  : assert(extentRatio > 0 && extentRatio <= 1),
-        assert(
-            openThreshold == null || (openThreshold > 0 && openThreshold < 1)),
-        assert(closeThreshold == null ||
-            (closeThreshold > 0 && closeThreshold < 1)),
+        assert(openThreshold == null || (openThreshold > 0 && openThreshold < 1)),
+        assert(closeThreshold == null || (closeThreshold > 0 && closeThreshold < 1)),
         super(key: key);
 
   /// The total extent of this [ActionPane] relatively to the enclosing
@@ -102,9 +100,7 @@ class ActionPane extends StatefulWidget {
   /// The action pane's data from the closest instance of this class that
   /// encloses the given context.
   static ActionPaneData? of(BuildContext context) {
-    return context
-        .dependOnInheritedWidgetOfExactType<_ActionPaneScope>()
-        ?.actionPaneData;
+    return context.dependOnInheritedWidgetOfExactType<_ActionPaneScope>()?.actionPaneData;
   }
 }
 
@@ -177,9 +173,39 @@ class _ActionPaneState extends State<ActionPane> implements RatioConfigurator {
     final gesture = controller!.endGesture.value;
     final position = controller!.animation.value;
 
-    if (widget.dismissible != null &&
-        widget.dragDismissible &&
-        position > widget.extentRatio) {
+    // Custom thresholds for different swipe actions
+    const double halfSwipeThreshold = 0.5;
+    const double quarterSwipeThreshold = 0.25;
+    print(position);
+    print("extent : ${widget.extentRatio}");
+
+    if (position < quarterSwipeThreshold / 2) {
+      //performHalfSwipeAction();
+      print("here less");
+
+      controller!.close();
+
+      return;
+    }
+    if (position <= quarterSwipeThreshold || (position > quarterSwipeThreshold && position < halfSwipeThreshold)) {
+      //showQuarterSwipeUI();
+      print("here quarter");
+
+      controller!.openCurrentActionPane(extent: quarterSwipeThreshold);
+
+      return;
+    }
+
+    if (position >= halfSwipeThreshold) {
+      //performHalfSwipeAction();
+      print("here half");
+
+      controller!.close();
+
+      return;
+    }
+
+    if (widget.dismissible != null && widget.dragDismissible && position > widget.extentRatio) {
       if (controller!.isDismissibleReady) {
         controller!.dismissGesture.value = DismissGesture(gesture);
       } else {
@@ -191,9 +217,7 @@ class _ActionPaneState extends State<ActionPane> implements RatioConfigurator {
     }
 
     if ((gesture is OpeningGesture && openThreshold <= extentRatio) ||
-        gesture is StillGesture &&
-            ((gesture.opening && position >= openThreshold) ||
-                gesture.closing && position > closeThreshold)) {
+        gesture is StillGesture && ((gesture.opening && position >= openThreshold) || gesture.closing && position > closeThreshold)) {
       controller!.openCurrentActionPane();
       return;
     }
@@ -203,8 +227,7 @@ class _ActionPaneState extends State<ActionPane> implements RatioConfigurator {
   }
 
   void handleRatioChanged() {
-    final show = controller!.ratio.abs() <= widget.extentRatio &&
-        !controller!.isDismissibleReady;
+    final show = controller!.ratio.abs() <= widget.extentRatio && !controller!.isDismissibleReady;
     if (show != showMotion) {
       setState(() {
         showMotion = show;
