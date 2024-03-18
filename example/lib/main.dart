@@ -33,7 +33,7 @@ class _MyAppState extends State<MyApp> with SingleTickerProviderStateMixin {
 
                 // A pane can dismiss the Slidable.
                 dismissible: DismissiblePane(onDismissed: () {}),
-
+                extentRatio: 0.25,
                 // All actions are defined in the children parameter.
                 children: const [
                   // A SlidableAction can have an icon and/or a label.
@@ -44,18 +44,11 @@ class _MyAppState extends State<MyApp> with SingleTickerProviderStateMixin {
                     icon: Icons.delete,
                     label: 'Delete',
                   ),
-                  SlidableAction(
-                    onPressed: doNothing,
-                    backgroundColor: Color(0xFF21B7CA),
-                    foregroundColor: Colors.white,
-                    icon: Icons.share,
-                    label: 'Share',
-                  ),
                 ],
               ),
 
               // The end action pane is the one at the right or the bottom side.
-              endActionPane:  ActionPane(
+              endActionPane: ActionPane(
                 motion: const ScrollMotion(),
                 children: [
                   SlidableAction(
